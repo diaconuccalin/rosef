@@ -1,4 +1,8 @@
-#servo
+#!/usr/bin/env python
+
+# servo_key.py
+# 2015-04-10
+# Public Domain
 
 import time
 import curses
@@ -6,7 +10,7 @@ import atexit
 
 import pigpio 
 
-SERVO = 18
+SERVO = 4
 
 MIN_PW = 1000
 MID_PW = 1500
@@ -75,61 +79,32 @@ pulsewidth = MID_PW
 
 pi.set_servo_pulsewidth(SERVO, pulsewidth)
 
+while True:
 
+   time.sleep(0.01)
 
-#joystick
+   c = getch()
 
-import pygame
+   if c == QUIT:
+      break
 
-pygame.init()
+   pw = pulsewidth
 
-done = False
+   if c == HOME:
+      pw = MID_PW # Stop.
+   elif c == UP_ARROW:
+      pw = MAX_PW # Fastest clockwise.
+   elif c == DOWN_ARROW:
+      pw = MIN_PW # Fastest anti-clockwise
+   elif c == LEFT_ARROW:
+      pw = pw - 5 # Shorten pulse.
+      if pw < MIN_PW:
+         pw = MIN_PW
+   elif c == RIGHT_ARROW:
+      pw = pw + 5 # Lengthen pulse.
+      if pw > MAX_PW:
+         pw = MAX_PW
 
-pygame.joystick.init()
-
-
-
-
-#loop
-
-while done == False:
-    for event in pygame.event.get(): # User did something
-        if event.type == pygame.QUIT: # If user clicked close
-            done=True # Flag that we are done so we exit this loop
-        
-        # Possible joystick actions: JOYAXISMOTION JOYBALLMOTION JOYBUTTONDOWN JOYBUTTONUP JOYHATMOTION
-        if event.type == pygame.JOYBUTTONDOWN:
-            print("Joystick button pressed.")
-            done = True
-        if event.type == pygame.JOYBUTTONUP:
-            print("Joystick button released.")
-
-    time.sleep(0.01)
-
-    c = getch()
-
-    if c == QUIT:
-       break
-
-    pw = pulsewidth
-
-    if c == HOME:
-       pw = MID_PW # Stop.
-    elif c == UP_ARROW:
-       pw = MAX_PW # Fastest clockwise.
-    elif c == DOWN_ARROW:
-       pw = MIN_PW # Fastest anti-clockwise
-    elif c == LEFT_ARROW:
-       pw = pw - 5 # Shorten pulse.
-       if pw < MIN_PW:
-          pw = MIN_PW
-    elif c == RIGHT_ARROW:
-       pw = pw + 5 # Lengthen pulse.
-       if pw > MAX_PW:
-          pw = MAX_PW
-
-    if pw != pulsewidth:
-       pulsewidth = pw
-       pi.set_servo_pulsewidth(SERVO, pulsewidth)
-
-pygame.quit ()
+   if pw != pulsewidth:
+      pulsewidth = pw
+      pi.set_servo_pulsewidth(SERVO, pulsewidth)
