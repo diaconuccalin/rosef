@@ -17,6 +17,7 @@ import atexit
 import pigpio
 
 SERVO = 18
+aux=0
 
 MIN_PW = 1000
 MID_PW = 1500
@@ -42,42 +43,33 @@ pi.set_servo_pulsewidth(SERVO, pulsewidth)
 
 while done==False:
     pw = pulsewidth
-    
-    for event in pygame.event.get():
-        
-        if event.type == pygame.JOYBUTTONDOWN:
-            print("Joystick button pressed.")
-        if event.type == pygame.JOYBUTTONUP:
-            print("Joystick button released.")
-            done = True
+
+    pygame.event.get()
             
     joystick_count = pygame.joystick.get_count()
 
-    for i in range(joystick_count):
-        joystick = pygame.joystick.Joystick(i)
-        joystick.init()
+    joystick = pygame.joystick.Joystick(0)
+    joystick.init()
+           
+    axis = joystick.get_axis( 0 )
     
-        name = joystick.get_name()
+    pw = pw + axis * 0.2
+
+    if pw > MAX_PW:
+        pw = MAX_PW
+    elif pw < MIN_PW:
+        pw = MIN_PW
+
+    if joystick.get_button(9) == 1:
+        done = True
         
-        axes = joystick.get_numaxes()
+    #hats = joystick.get_numhats()
         
-        for i in range( axes ):
-            axis = joystick.get_axis( i )
-            if i == 2:
-                if axis < 0:
-                    pw = MIN_PW
-                else:
-                    pw = MAX_PW
-                    print("test")
-            
-        buttons = joystick.get_numbuttons()
-        
-        for i in range( buttons ):
-            button = joystick.get_button( i )
-            
-        hats = joystick.get_numhats()
-        
-        for i in range( hats ):
-            hat = joystick.get_hat( i )
+    #for i in range( hats ):
+    #    hat = joystick.get_hat( i )
+
+    if pw != pulsewidth:
+        pulsewidth = pw
+        pi.set_servo_pulsewidth(SERVO, pulsewidth)
     
 pygame.quit ()
