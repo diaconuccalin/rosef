@@ -43,6 +43,16 @@ pulsewidth2 = MID_PW
 pi.set_servo_pulsewidth(SERVO1, pulsewidth1)
 pi.set_servo_pulsewidth(SERVO2, pulsewidth2)
 
+#motoare
+frontRight1 = 22
+frontRight2 = 23
+
+pi.set_mode(frontRight1, pigpio.OUTPUT)
+pi.set_mode(frontRight2, pigpio.OUTPUT)
+
+
+
+
 while done==False:
     pw1 = pulsewidth1
     pw2 = pulsewidth2
@@ -70,6 +80,16 @@ while done==False:
 
     if joystick.get_button(9) == 1:
         done = True
+
+    if joystick.get_button(5) == 1:
+        pi.write(frontRight1, 1)
+        pi.write(frontRight2, 0)
+    elif joystick.get_button(7) == 1:
+        pi.write(frontRight1, 0)
+        pi.write(frontRight2, 1)
+    else:
+        pi.write(frontRight1, 0)
+        pi.write(frontRight2, 0)
         
     #hats = joystick.get_numhats()
         
